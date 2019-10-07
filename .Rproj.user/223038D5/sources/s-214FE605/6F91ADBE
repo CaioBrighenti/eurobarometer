@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1570382896582.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "6F91ADBE",
+    "lastKnownWriteTime" : 1570411695,
+    "last_content_update" : 1570411695859,
+    "path" : "~/Repositories/eurobarometer/1.R",
+    "project_path" : "1.R",
+    "properties" : {
+        "cursorPosition" : "95,0",
+        "scrollLine" : "68"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
