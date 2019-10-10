@@ -13,7 +13,7 @@ dat %>%
 
 ## MATERIALIST
 dat_mat <- dat %>%
-  filter(matpmat %in% c("materialist", "postmat")) %>%
+  filter(matpmat %in% c("materialist", "postmat","mixed")) %>%
   group_by(year, nation1) %>%
   count(matpmat) %>%
   spread(matpmat,n) %>%
@@ -78,7 +78,7 @@ eu_valpri <- dat_valpri %>%
   group_by(year) %>%
   summarise(eu_order = mean(`MAINTAIN ORDER`), 
             eu_particip = mean(`MORE PARTICIP.`),
-            eu_inflation = mean(`MORE PARTICIP.`),
+            eu_inflation = mean(`FIGHT INFLATION`),
             eu_freedom = mean(`FREEDOM OF SPEECH`))
 
 dat_valpri %>%
