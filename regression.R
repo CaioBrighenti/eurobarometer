@@ -6,16 +6,21 @@ dat <- read.dta("ZA3521_v2-0-1.dta") %>%
   as_tibble()
 
 dat %>%
-  filter(!is.na(income)) %>%
+  filter(!is.na(sex)) %>%
   dplyr::select(nation1, year) %>%
   group_by(nation1) %>%
   table()
 
 ## DEMOGRAPHICS
 dat_demo <- dat %>%
-  dplyr::select(nation1,year,income) %>%
   group_by(nation1,year) %>%
-  summarize(income = mean(income, na.rm = TRUE))
+  filter(income %in% c(1,2,3,4,5,6,7,8,9,10,11,12,13),
+         sex != "inap") %>%
+  mutate(sex_num = ifelse(sex == "male",1,0)) %>%
+  dplyr::select(id,nation1,year,income,sex_num, age)
+  # summarize(income = mean(income, na.rm = TRUE),
+  #           male_prop = mean(sex_num),
+  #           age = mean(age))
 
 ## MATERIALIST
 dat_mat <- dat %>%
@@ -39,16 +44,27 @@ dat_mat %>%
 
 
 ## model
-dat_mod <- dat_mat %>%
-  left_join(dat_demo, by=c("nation1","year"))
-mod <- lm(mat_index~as.factor(year)+income,data=dat_mod)
+dat_mod <- dat %>%
+  dplyr::select(id,nation1,matpmat) %>%
+  filter(matpmat %in% c("materialist", "postmat","mixed")) %>%
+  mutate(mat_ratio = ifelse(matpmat == "materialist",1,
+                            ifelse(matpmat == "postmaterialist",0,
+                                   0.5))) %>%
+  dplyr::select(-matpmat) %>%
+  inner_join(dat_demo, by=c("id","nation1"))
+mod <- lm(mat_ratio~as.factor(year)+as.factor(income)+as.factor(sex_num)+age,data=dat_mod)
 summary(mod)
 
 coefs <- coef(mod) %>%
   enframe() %>% 
   filter(grepl("year",name)) %>%
-  mutate(year = gsub("as.factor(year)","",name,fixed=TRUE))
+  mutate(year = as.numeric(gsub("as.factor(year)","",name,fixed=TRUE)),coef = value) %>%
+  dplyr::select(year, coef)
 
 coefs %>%
-  ggplot(aes(x=name,y=value,group=1)) +
-  geom_line()
+  left_join(eu_mat,by=c("year")) %>%
+  gather(group,val, coef:eu_mat_index) %>%
+  ggplot(aes(x=year,group=1)) +
+  geom_line(aes(y=val)) +
+  geom_point(aes(y=val)) +
+  facet_wrap(~group)
