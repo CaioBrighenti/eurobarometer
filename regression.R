@@ -1,5 +1,6 @@
 library(foreign)
 library(tidyverse)
+library(lme4)
 '%!in%' <- function(x,y)!('%in%'(x,y))
 
 dat <- read.dta("ZA3521_v2-0-1.dta") %>%
@@ -52,6 +53,11 @@ dat_mod <- dat %>%
                                    0.5))) %>%
   dplyr::select(-matpmat) %>%
   inner_join(dat_demo, by=c("id","nation1"))
+dat_mod_eu <- dat_mod %>%
+  mutate(nation2 = ifelse(nation1 %in% c("denmark","spain"),nation1,"eu"))
+  
+
+
 mod <- lm(mat_ratio~as.factor(year)+as.factor(income)+as.factor(sex_num)+age,data=dat_mod)
 summary(mod)
 
@@ -68,3 +74,11 @@ coefs %>%
   geom_line(aes(y=val)) +
   geom_point(aes(y=val)) +
   facet_wrap(~group)
+
+
+## MIXED EFFECTS MODEL
+dat_mod_sample <- dat_mod_eu[sample(seq(1,nrow(dat_mod)),size=1000),]
+mod.me <- lmer(mat_ratio ~ as.factor(year)+
+                 (as.factor(year)|nation2),
+                  data=dat_mod_eu)
+summary(mod.me)
