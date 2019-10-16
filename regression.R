@@ -77,8 +77,13 @@ coefs %>%
 
 
 ## MIXED EFFECTS MODEL
+dat_mod_eu <- dat_mod_eu %>%
+  mutate(mat_ratio = as.numeric(mat_ratio),
+         year = as.factor(year),
+         income = as.numeric(income),
+         nation2 = as.factor(nation2))
 dat_mod_sample <- dat_mod_eu[sample(seq(1,nrow(dat_mod)),size=1000),]
-mod.me <- lmer(mat_ratio ~ as.factor(year)+
-                 (as.factor(year)|nation2),
+mod.me <- lmer(mat_ratio ~ year+
+                 (1+year|nation2),
                   data=dat_mod_eu)
 summary(mod.me)
