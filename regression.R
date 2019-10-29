@@ -6,11 +6,11 @@ library(lme4)
 dat <- read.dta("ZA3521_v2-0-1.dta") %>%
   as_tibble()
 
-dat %>%
-  filter(!is.na(sex)) %>%
+nation_years <- dat %>%
   dplyr::select(nation1, year) %>%
   group_by(nation1) %>%
-  table()
+  summarise(total_years = n_distinct(year)) %>%
+  mutate(join_year = 2003 - total_years)
 
 ## DEMOGRAPHICS
 dat_demo <- dat %>%
@@ -64,26 +64,28 @@ summary(mod)
 coefs <- coef(mod) %>%
   enframe() %>% 
   filter(grepl("year",name)) %>%
-  mutate(year = as.numeric(gsub("as.factor(year)","",name,fixed=TRUE)),coef = value) %>%
+  mutate(year = as.numeric(gsub("as.factor(year)","",name,fixed=TRUE)),coef = value+0.6312) %>%
   dplyr::select(year, coef)
 
 coefs %>%
-  left_join(eu_mat,by=c("year")) %>%
+  right_join(eu_mat,by=c("year")) %>%
   gather(group,val, coef:eu_mat_index) %>%
   ggplot(aes(x=year,group=1)) +
-  geom_line(aes(y=val)) +
-  geom_point(aes(y=val)) +
-  facet_wrap(~group)
+  geom_line(aes(y=val,group=group,color=group)) +
+  geom_point(aes(y=val,color=group))
 
 
 ## MIXED EFFECTS MODEL
-dat_mod_eu <- dat_mod_eu %>%
+dat_me <- dat_mod_eu %>%
   mutate(mat_ratio = as.numeric(mat_ratio),
          year = as.factor(year),
          income = as.numeric(income),
-         nation2 = as.factor(nation2))
-dat_mod_sample <- dat_mod_eu[sample(seq(1,nrow(dat_mod)),size=1000),]
-mod.me <- lmer(mat_ratio ~ year+
-                 (1+year|nation2),
-                  data=dat_mod_eu)
+         nation2 = as.factor(nation2)) %>%
+  left_join(nation_years,by=c("nation1")) %>%
+  mutate(years_since_joining = as.numeric(as.character(year)) - join_year)
+dat_me_sample <- dat_me[sample(seq(1,nrow(dat_me)),size=10000),]
+
+mod.me <- lmer(mat_ratio ~ years_since_joining+(1|nation1),
+                  data=dat_me_sample)
 summary(mod.me)
+coef(mod.me)
