@@ -3,7 +3,7 @@ library(tidyverse)
 library(lme4)
 '%!in%' <- function(x,y)!('%in%'(x,y))
 
-dat <- read.dta("ZA3521_v2-0-1.dta") %>%
+dat <- read.dta("data/ZA3521_v2-0-1.dta") %>%
   as_tibble()
 
 nation_years <- dat %>%
