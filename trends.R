@@ -80,7 +80,7 @@ p1 <- mat_trends %>%
   geom_line(aes(y=spain,color="Spain"),lwd=1.5) +
   theme_minimal() +
   geom_vline(xintercept = c(1973,1986),linetype="dotted") +
-  theme_bw() +
+  theme_minimal() +
   scale_color_grey() +
   ggtitle("Materialism in European countries over time") +
   xlab("year") +
@@ -94,7 +94,7 @@ p2 <- mat_trends %>%
   geom_line(aes(y=dist_den,color="Denmark"),lwd=1.5) +
   geom_line(aes(y=dist_spa,color="Spain"),lwd=1.5) +
   geom_hline(yintercept=0,linetype="longdash") +
-  theme_bw() +
+  theme_minimal() +
   scale_color_grey() +
   ggtitle("Distance from EU in materialism level") +
   xlab("year") +
@@ -181,7 +181,7 @@ p3 <- membership_trends %>%
   geom_line(aes(y=denmark,color="Denmark"),lwd=1.5) +
   geom_line(aes(y=spain,color="Spain"),lwd=1.5) +
   geom_vline(xintercept = c(1973,1986),linetype="dotted") +
-  theme_bw() +
+  theme_minimal() +
   scale_color_grey() +
   ggtitle("Support for EU membership in European countries over time") +
   xlab("year") +
@@ -191,7 +191,7 @@ p3 <- membership_trends %>%
 #   ggplot(aes(x=year,y=membership_index))+
 #   geom_line(aes(color=nation1),lwd=1) +
 #   geom_line(data = membership_trends,aes(x=year,y=eu,color="EU"),linetype="dotted",lwd=1) +
-#   theme_bw() +
+#   theme_minimal() +
 #   ggtitle("Support for EU membership in European countries over time") +
 #   xlab("year") +
 #   ylab("support for membership") +
@@ -206,7 +206,7 @@ p4 <- membership_trends %>%
   geom_line(aes(y=dist_spa,color="Spain"),lwd=1.5) +
   geom_hline(yintercept=0,linetype="longdash") +
   geom_vline(xintercept = c(1973,1986),linetype="dotted") +
-  theme_bw() +
+  theme_minimal() +
   scale_color_grey() +
   ggtitle("Distance from EU in support for EU membership") +
   xlab("year") +
