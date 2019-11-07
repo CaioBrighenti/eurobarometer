@@ -213,5 +213,5 @@ p4 <- membership_trends %>%
   ylab("distance from EU average")
 
 
-plot_grid(p1,p2,p3,p4, labels = c('A', 'B', 'C', 'D'), label_size = 12)
+plot_grid(p1,p2,p3,p4,labels = c('A', 'B', 'C', 'D'), label_size = 12)
 
