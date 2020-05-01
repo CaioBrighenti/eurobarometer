@@ -23,7 +23,7 @@ dat_mat <- dat %>%
   count(matpmat) %>%
   spread(matpmat,n) %>%
   mutate(total = materialist + mixed + postmat,
-         mat_index = ((1*materialist) + (.5 * mixed) + (0*postmat))/total)
+         mat_index = ((1*postmat) + (.5 * mixed) + (0*materialist))/total)
 
 eu_mat <- dat_mat %>%
   filter(nation1 %!in% c("denmark", "spain")) %>%
@@ -33,7 +33,7 @@ eu_mat <- dat_mat %>%
 dat_mat %>%
   left_join(eu_mat, by=c("year")) %>%
   ggplot(aes(x=year)) +
-  geom_line(aes(y=mat_index,color="Materialist Index")) +
+  geom_line(aes(y=mat_index,color="Postmaterialist Index")) +
   geom_line(aes(y=eu_mat_index, color = "EU Average"), alpha=0.5, linetype="longdash")+
   facet_wrap(~nation1)
 
@@ -82,21 +82,22 @@ p1 <- mat_trends %>%
   geom_vline(xintercept = c(1973,1986),linetype="dotted") +
   theme_minimal() +
   scale_color_grey() +
-  ggtitle("Materialism in European countries over time") +
+  ggtitle("Postmaterialism in European countries over time") +
   xlab("year") +
-  ylab("materialism index")
+  ylab("postmaterialism index")
 
 # distance plot
 p2 <- mat_trends %>%
   filter(!is.na(eu)) %>%
-  mutate(dist_den = eu - denmark,dist_spa = eu - spain) %>%
+  mutate(dist_den = denmark - eu,dist_spa = spain - eu) %>%
   ggplot(aes(x=year)) +
   geom_line(aes(y=dist_den,color="Denmark"),lwd=1.5) +
   geom_line(aes(y=dist_spa,color="Spain"),lwd=1.5) +
   geom_hline(yintercept=0,linetype="longdash") +
+  geom_vline(xintercept = c(1973,1986),linetype="dotted") +
   theme_minimal() +
   scale_color_grey() +
-  ggtitle("Distance from EU in materialism level") +
+  ggtitle("Distance from EU in postmaterialism level") +
   xlab("year") +
   ylab("distance from EU average")
   
@@ -200,7 +201,7 @@ p3 <- membership_trends %>%
 # distance plot
 p4 <- membership_trends %>%
   filter(!is.na(eu)) %>%
-  mutate(dist_den = eu - denmark,dist_spa = eu - spain) %>%
+  mutate(dist_den = denmark - eu,dist_spa = spain - eu) %>%
   ggplot(aes(x=year)) +
   geom_line(aes(y=dist_den,color="Denmark"),lwd=1.5) +
   geom_line(aes(y=dist_spa,color="Spain"),lwd=1.5) +
@@ -213,5 +214,31 @@ p4 <- membership_trends %>%
   ylab("distance from EU average")
 
 
-plot_grid(p1,p2,p3,p4,labels = c('A', 'B', 'C', 'D'), label_size = 12)
+plot_grid(p1,p3,labels = c('C', 'D', 'C', 'D'), label_size = 12)
 
+
+
+#####################################
+########## TEST PROXIES #############
+#####################################
+library(MASS)
+tbl <- dat %>%
+  filter(feel %in% c("national","NAT+EUROPEAN","EUROPEAN+NAT","european"),
+         membrshp %in% c("GOOD THING","NEITHER NOR","BAD THING")) %>%
+  dplyr::select(feel,membrshp) %>%
+  table() 
+tbl <- tbl[1:4,1:3]
+
+chi <- chisq.test(tbl)
+(chi$observed - chi$expected) / chi$expected * 100
+
+library(lsr)
+cramersV(tbl)
+
+# count n
+dat %>%
+  filter(feel %in% c("national","NAT+EUROPEAN","EUROPEAN+NAT","european"),
+         membrshp %in% c("GOOD THING","NEITHER NOR","BAD THING")) %>%
+  dplyr::select(feel,membrshp) %>%
+  complete.cases() %>%
+  length()
